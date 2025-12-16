@@ -15,30 +15,31 @@ test.describe('Login suite', () => {
   test('login with valid credentials', async ({ page }) => {
 
     const Login = new LoginPage(page)
-    await Login.login('arnoldmusiikamwiine@gmail.com', 'Camewent123@')
+    await Login.login('postcom2@sharklasers.com', 'Postcom2@')
 
   });
 
   test('Login with invalid email and correct password', async ({ page }) => {
     const Login = new LoginPage(page)
-    await Login.login('arnoldmuiikamwiine@gmail.com', 'Camewent123@')
+    await Login.login('postcotest@sharklasers.com', 'Postcom2@')
     await expect(page.getByRole('alert')).toContainText('User with email does not exist');
   });
 
   test('Login with invalid password', async ({ page }) => {
     const Login = new LoginPage(page)
-    await Login.login('arnoldmusiikamwiine@gmail.com', 'Cameent123@')
+    await Login.login('postcom2@sharklasers.com', 'Cameent123@')
     await expect(page.getByRole('alert')).toContainText('Invalid user password');
   });
 
   test.only('Login as vendor', async({page}) =>{
     const Login = new LoginPage(page)
-    await Login.login('arnoldmusiikamwiine@gmail.com', 'Camewent123@')
+    await Login.login('postcom2@sharklasers.com', 'Postcom2@')
     await page.getByText('Continue as vendor').click();
+    await page.getByText('MY WALLET')
   })
   test('Logout successfully', async ({ page }) => {
     const Login = new LoginPage(page)
-    await Login.login('arnoldmusiikamwiine@gmail.com', 'Camewent123@')
+    await Login.login('postcom2@sharklasers.com', 'Postcom2@')
     await page.getByText('Continue as Customer').click();
     await page.getByRole('button', { name: 'User menu' }).click();
     await page.getByRole('button', { name: 'Logout' }).click();
