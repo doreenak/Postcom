@@ -7,7 +7,8 @@ exports.LoginPage = class LoginPage {
         this.login_button = page.getByRole('button', { name: 'Login' })
     }
     async gotoLoginPage() {
-        await this.page.goto('https://postcom.labs.eposta.ug/shop')
+        // await this.page.goto('https://postcom.labs.eposta.ug/shop')
+        // await gotoHomePage();
         await this.page.getByRole('link', { name: 'Sign in or register' }).click();
         //await expect(this.page.getByRole('button', { name: 'Toggle password visibility' })).toBeVisible();
     }

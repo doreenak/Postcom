@@ -1,10 +1,13 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/Login';
+import { HomePage } from '../pages/HomePage';
 
 test.describe('Login suite', () => {
 
   test.beforeEach(async ({ page }) => {
     const Login = new LoginPage(page)
+    const Home = new HomePage(page)
+    await Home.gotoHomePage()
     await Login.gotoLoginPage()
   })
 
@@ -31,7 +34,7 @@ test.describe('Login suite', () => {
     await expect(page.getByRole('alert')).toContainText('Invalid user password');
   });
 
-  test.only('Login as vendor', async({page}) =>{
+  test('Login as vendor', async ({ page }) => {
     const Login = new LoginPage(page)
     await Login.login('postcom2@sharklasers.com', 'Postcom2@')
     await page.getByText('Continue as vendor').click();
@@ -45,6 +48,3 @@ test.describe('Login suite', () => {
     await page.getByRole('button', { name: 'Logout' }).click();
   });
 })
-
-
-
