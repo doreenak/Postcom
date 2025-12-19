@@ -2,13 +2,12 @@ exports.LoginPage = class LoginPage {
     constructor(page) {
 
         this.page = page
-        this.email_textbox = page.getByRole('textbox', { name: 'Email' });
-        this.password_textbox = page.getByRole('textbox', { name: 'Password' })
-        this.login_button = page.getByRole('button', { name: 'Login' })
+        this.email_textbox = this.page.getByRole('textbox', { name: 'Email' });
+        this.password_textbox = this.page.getByRole('textbox', { name: 'Password' })
+        this.login_button = this.page.getByRole('button', { name: 'Login' })
     }
     async gotoLoginPage() {
-        // await this.page.goto('https://postcom.labs.eposta.ug/shop')
-        // await gotoHomePage();
+        
         await this.page.getByRole('link', { name: 'Sign in or register' }).click();
         //await expect(this.page.getByRole('button', { name: 'Toggle password visibility' })).toBeVisible();
     }

@@ -67,7 +67,7 @@ test.describe('Profile Page suite', () => {
             await expect(page.getByRole('heading', { name: 'Promotions', exact: true })).toBeVisible();
         })
 
-        test.only('Navigate to Settlements Page from vendor dashboard', async ({ page }) => {
+        test('Navigate to Settlements Page from vendor dashboard', async ({ page }) => {
             const Profile = new ProfilePage(page)
             await Profile.navigateToSettlements()
             await expect(page.getByRole('button', { name: 'ACCOUNTS' })).toBeVisible();

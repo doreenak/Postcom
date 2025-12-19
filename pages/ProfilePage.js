@@ -14,6 +14,7 @@ exports.ProfilePage = class profilePage {
         this.shipments = page.getByRole('link', { name: 'Shipments' });
         this.returns = page.getByRole('link', { name: 'Returns' });
         this.inventory = page.getByRole('link', { name: 'Inventory' });
+        this.mainEmail = page.getByLabel('Main Email');
     }
 
     async navigateToProfile() {

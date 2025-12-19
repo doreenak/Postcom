@@ -1,13 +1,17 @@
 // @ts-check
 import { defineConfig, devices } from '@playwright/test';
-
+import dotenv from 'dotenv';
+import path from 'path';
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-import dotenv from 'dotenv';
-import path from 'path';
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+const environment = process.env.ENVIRONMENT || 'dev';
+const environmentPath = path.resolve(__dirname, `./env/.env.${environment}`);
+
+
+dotenv.config({ path: environmentPath });
 
 /**
  * @see https://playwright.dev/docs/test-configuration
@@ -27,11 +31,11 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     // video: 'on',
-    // launchOptions:{
-    //   slowMo: 1000
-    // },
+    launchOptions:{
+      slowMo: 1000, 
+    },
     // /* Base URL to use in actions like `await page.goto('')`. */
-    baseURL: 'http://postcom.labs.eposta.ug/shop',
+    baseURL: 'http://postcom.labs.eposta.ug/shop', //baseURL: process.env.BASE_URL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
