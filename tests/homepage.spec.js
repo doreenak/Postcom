@@ -23,7 +23,7 @@ test.describe('Home Page suite', () => {
     });
 
     test('Verify exclusive deals on the site', async ({ page }) => {
-        const Home = new HomePage(page)
+         const Home = new HomePage(page)
         await Home.verifyExclusiveDeals()
         await expect(Home.exclusive_deals).toBeVisible();
     });

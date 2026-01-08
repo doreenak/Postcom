@@ -1,3 +1,10 @@
+const { expect } = require('@playwright/test');
+const { WebMailPage } = require('./WebMailPage');
+const { LoginPage } = require('./Login');
+const { faker } = require('@faker-js/faker');
+const { HomePage } = require('./HomePage');
+
+
 exports.CreateAccountPage = class createAccountPage {
 
     constructor(page) {
@@ -15,10 +22,59 @@ exports.CreateAccountPage = class createAccountPage {
         this.phone_number_input = page.getByRole('textbox', { name: 'Phone Number *' });
         this.create_account_button = page.getByRole('button', { name: 'Create Account' });
         this.next_button = this.page.getByRole('button', { name: 'Next' });
+        this.selectMaleRadio = this.page.getByRole('radio', { name: 'Male', exact: true });
+        this.selectFemaleRadio = this.page.getByRole('radio', { name: 'Female' });
+        this.saveProfileButton = this.page.getByRole('button', { name: 'Save Profile' });
+        this.dateOfBirthInput = this.page.getByRole('textbox', { name: 'Date of Birth' });
+    }
+
+    async createNewUser() {
+
+        const webMailPage = new WebMailPage(this.page);
+
+        const email = await this.gotoCreateAccountPage();
+        await this.page.bringToFront();
+        await this.page.goto('/auth/register');
+        await this.gotoCreateAccount('New', 'User');
+        await this.submit(email);
+        await this.setPhoneNumber('');
+
+        const confirmLink = await webMailPage.confirmWebMailRegistration();
+
+        const [registrationTab] = await Promise.all([
+            this.context.waitForEvent('page'),
+            confirmLink.click()
+        ]);
+        const createAccountOnNewTab = new this.constructor(registrationTab);
+        await createAccountOnNewTab.setPassword('0xXxx@@x0', '0xXxx@@x0');
+        //await this.page.pause();
+        console.log('redirected to profile page');
+        const loginOnNewTab = new LoginPage(registrationTab);
+        await expect(loginOnNewTab.email_textbox).toBeVisible({ timeout: 10000 });
+
+        await loginOnNewTab.login(email, '0xXxx@@x0');
+        await expect(registrationTab.getByRole('heading', { name: 'Complete Your Profile' })).toBeVisible();
+
+        await createAccountOnNewTab.gotoCompleteProfilePage();
+        await expect(await registrationTab.getByText('Shop Postcom - Your Ultimate').nth(1)).toBeVisible();
+        console.log('New user created and profile completed successfully');
+
+        const homePageOnNewTab = new HomePage(registrationTab);
+        // Ensure the shop is loaded before searching
+        await registrationTab.goto('/shop');
+        await homePageOnNewTab.orderProductAsNewCustomer();
+        return registrationTab;
+
+
     }
 
     async gotoCreateAccountPage() {
         await this.page.goto(this.url);
+        const webMail = new WebMailPage(this.page);
+        const email = await webMail.createNewFakeUser(); // Ensure this is awaited
+        return email;
+        //signup using temporary email
+
     }
 
     async gotoCreateAccount(firstName, lastName) {
@@ -27,6 +83,25 @@ exports.CreateAccountPage = class createAccountPage {
 
     }
 
+    async gotoCompleteProfilePage() {
+
+        const birthDate = faker.date.birthdate({ min: 18, max: 65, mode: 'age' });
+        const formattedDob = birthDate.toISOString().split('T')[0];
+        const randomGender = faker.person.sex(); // Returns 'male' or 'female'
+
+        // 3. Fill the form fields
+        // Filling birth date input
+        await this.dateOfBirthInput.fill(formattedDob);
+
+        if (randomGender === 'male') {
+            await this.selectMaleRadio.check();
+        } else {
+            await this.selectFemaleRadio.check();
+        }
+        await this.saveProfileButton.click();
+        console.log(`Testing with: DOB=${formattedDob}, Gender=${randomGender}`);
+        //return new CompleteProfilePage(this.page);
+    }
     async getEmailSentConfirmationMessage() {
         return await this.page.getByText('A confirmation email has been sent to your email address. Please check your inbox to verify your account.').isVisible();
     }
@@ -49,8 +124,8 @@ exports.CreateAccountPage = class createAccountPage {
         //await browser.pause(5000);
     }
 
-    async submit(emailAddress) {
-        await this.email_input.fill(emailAddress);
+    async submit(email) {
+        await this.email_input.fill(String(email));
 
     }
     async setPhoneNumber(phoneNumberValue) {

@@ -33,7 +33,7 @@ test.describe('Create Account Page suite', () => {
         //await webMailPage.confirmWebMailRegistration();
         //await page.pause();
         const [newPage] = await Promise.all([
-            context.waitForEvent('page'),
+            this.context.waitForEvent('page'),
             webMailPage.confirmWebMailRegistration()
         ]);
 
@@ -43,11 +43,11 @@ test.describe('Create Account Page suite', () => {
         //await createAccount.setPassword('0xXxx@@x0', '0xXxx@@x0');
         //await expect(CreateAccountPage.errorAlert.getText()).toContain('Password confirmation does not match the new password.');
         //await createAccountPage.setPassword('0xXxx@@x0', '0xXxx@@x0');
-        //await expect(browser.getUrl()).toContain('/users/healthy-eating-profile');
+        await page.pause();
         console.log('redirected to profile page');
-        //await page.pause();
         const login = new LoginPage(page);
-        await login.login(newEmail, '0xXxx@@x0');
+        await login.newLogin(newEmail, '0xXxx@@x0');
+        await page.waitForLoadState('networkidle');
         const profilePage = new ProfilePage(page);
         await expect(profilePage.user_menu).toBeVisible();
         //await page.getByText('Continue as Customer').click();

@@ -12,8 +12,16 @@ exports.LoginPage = class LoginPage {
         //await expect(this.page.getByRole('button', { name: 'Toggle password visibility' })).toBeVisible();
     }
     async login(email, password) {
-        await this.email_textbox.fill(email)
-        await this.password_textbox.fill(password)
+        await this.email_textbox.fill(String(email || ''))
+        await this.password_textbox.fill(String(password || ''))
         await this.login_button.click()
     }
+
+    async newLogin(newEmail, newPassword) {
+        //await this.page.goto('/auth/login');
+        await this.email_textbox.fill(newEmail)
+        await this.password_textbox.fill(newPassword)
+        await this.login_button.click()
+    }
+    
 }

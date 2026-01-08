@@ -1,3 +1,5 @@
+const { expect } = require('@playwright/test');
+
 exports.WebMailPage = class WebMailPage {
     constructor(page) {
         this.page = page;
@@ -28,7 +30,8 @@ exports.WebMailPage = class WebMailPage {
 
     getMailLocators(pageInstance) {
         return {
-            receivedEmail: pageInstance.getByRole('cell', { name: 'Welcome to Our Platform' }),
+
+            receivedEmail: pageInstance.getByRole('row').filter({ hasText: /Welcome/i }).first(),
             confirmLink: pageInstance.getByRole('link', { name: 'Sign In Now' })
         };
     }
@@ -58,22 +61,36 @@ exports.WebMailPage = class WebMailPage {
 
     async confirmWebMailRegistration() {
 
+        
+
+        if (!this.mailPage) await this.openTempWebmail();
+
         //if (!this.mailPage) throw new Error("Mail page not initialized. Call openTempWebmail first.");
         await this.mailPage.bringToFront();
-        await this.mailPage.reload();
+        //await this.mailPage.reload();
 
         const mailLocators = this.getMailLocators(this.mailPage);
+         await this.page.waitForTimeout(12000);
         console.log('Checking for registration email...');
+
+        await expect(async () => {
+            await this.mailPage.reload(); // Or click your 'Refresh' button locator
+            await expect(mailLocators.receivedEmail).toBeVisible({ timeout: 3000 });
+        }).toPass({ intervals: [5000], timeout: 120000 });
 
         await mailLocators.receivedEmail.waitFor({ state: 'visible', timeout: 240000 });
         await mailLocators.receivedEmail.click();
         console.log('registration email received');
-        await mailLocators.confirmLink.waitFor({ state: 'visible', timeout: 60000 });
-        const setPasswordLink = await mailLocators.confirmLink.getAttribute('href');
-        await mailLocators.confirmLink.click();
-        console.log('Opened registration link from email received to set password: ' + setPasswordLink);
-        //await this.page.pause();
-        return 'true';
+
+        const confirmLink = mailLocators.confirmLink;
+        await confirmLink.waitFor({ state: 'visible', timeout: 15000 });
+        return confirmLink;
+        //await mailLocators.confirmLink.waitFor({ state: 'visible', timeout: 60000 });
+        // const setPasswordLink = await mailLocators.confirmLink.getAttribute('href');
+        // await mailLocators.confirmLink.click();
+        // console.log('Opened registration link from email received to set password: ' + setPasswordLink);
+        // //await this.page.pause();
+        // return 'true';
 
         //const setPasswordLink = await this.confirmRegistration.getAttribute('href');
         // if (!setPasswordLink.includes('/users/register')) {
@@ -101,18 +118,4 @@ exports.WebMailPage = class WebMailPage {
 };
 
 
-//  async confirmWebMailRegistration() {
-//         // Use the mailPage tab to click the email
-//         await this.mailPage.reload();
-//         const emailRow = this.ReceivedEmailRegistration(this.mailPage);
-//         await emailRow.waitFor({ state: 'visible' });
-//         await emailRow.click();
 
-//         const link = this.confirmRegistration(this.mailPage);
-//         const setPasswordLink = await link.getAttribute('href');
-
-//         // Go back to the main application page to finalize registration
-//         await this.page.bringToFront();
-//         await this.page.goto(setPasswordLink);
-//         return 'true';
-//     }

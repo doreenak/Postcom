@@ -1,14 +1,18 @@
+const { expect } = require('@playwright/test');
+
 exports.HomePage = class homePage {
     constructor(page) {
 
-    
+        if (!page) {
+            throw new Error("HomePage constructor: 'page' argument is missing.");
+        }
         this.page = page
         this.url = '/shop';
 
         // Define selectors
         this.logo = page.getByRole('link', { name: 'Postcom' });
         this.sign_in_or_register = page.getByRole('link', { name: 'Sign in or register' });
-        this.search_box =page.getByRole('textbox', { name: 'Search for products, brands,' });
+        this.search_box = page.getByRole('textbox', { name: 'Search for products, brands,' });
         this.cart_icon = page.getByRole('link', { name: 'View cart' });
         this.categories_menu = page.getByRole('heading', { name: 'More Categories' });
         this.featured_products_section = page.locator('div').filter({ hasText: /^Festive Exclusive DealsShop Now!!!$/ }).nth(2);
@@ -18,11 +22,12 @@ exports.HomePage = class homePage {
         this.exclusive_deals = page.getByText('Festive Exclusive DealsShop').first();
         this.product_list = page.locator('.product-list');
         this.first_product = page.locator('.absolute.inset-0.flex.items-center.justify-center.gap-3').first();
+        //this .pick_product
     }
 
     async gotoHomePage() {
         await this.page.goto(this.url);
-        
+
     }
     async isLoaded() {
         await this.logo.waitFor();
@@ -51,6 +56,7 @@ exports.HomePage = class homePage {
     }
 
     async searchProduct(productName) {
+        await expect(this.page).toHaveURL(/.*\/shop/);
         await this.search_box.click();
         await this.search_box.fill(productName);
         await this.search_box.press('Enter');
@@ -58,5 +64,22 @@ exports.HomePage = class homePage {
 
     async goToCart() {
         await this.cart_icon.click();
+    }
+
+    async orderProductAsNewCustomer() {
+        await this.searchProduct('Laptop');
+        //await this.page.pause();
+        //await this.first_product.click();
+        await this.page.getByRole('img', { name: 'HP laptop' }).click();
+        await this.page.getByRole('button', { name: 'ADD TO CART' }).click();
+        await this.page.getByRole('link', { name: 'View cart' }).click();
+        const checkoutButton = this.page.getByRole('button', { name: 'Proceed to Checkout' });
+
+        if (await checkoutButton.isVisible()) {
+            await checkoutButton.click();
+        } else {
+            await this.page.getByRole('button', { name: 'Continue Shopping' }).click();
+        }
+        // await this.page.getByRole('button', { name: 'Proceed to Checkout' }).click();
     }
 }
