@@ -20,8 +20,8 @@ exports.HomePage = class homePage {
         this.continue_as_vendor_button = page.getByText('Continue as Vendor');
         this.continue_as_customer_button = page.getByText('Continue as Customer');
         this.exclusive_deals = page.getByText('Festive Exclusive DealsShop').first();
-        this.product_list = page.locator('.product-list');
         this.first_product = page.locator('.absolute.inset-0.flex.items-center.justify-center.gap-3').first();
+        
         //this .pick_product
     }
 
@@ -66,20 +66,5 @@ exports.HomePage = class homePage {
         await this.cart_icon.click();
     }
 
-    async orderProductAsNewCustomer() {
-        await this.searchProduct('Laptop');
-        //await this.page.pause();
-        //await this.first_product.click();
-        await this.page.getByRole('img', { name: 'HP laptop' }).click();
-        await this.page.getByRole('button', { name: 'ADD TO CART' }).click();
-        await this.page.getByRole('link', { name: 'View cart' }).click();
-        const checkoutButton = this.page.getByRole('button', { name: 'Proceed to Checkout' });
-
-        if (await checkoutButton.isVisible()) {
-            await checkoutButton.click();
-        } else {
-            await this.page.getByRole('button', { name: 'Continue Shopping' }).click();
-        }
-        // await this.page.getByRole('button', { name: 'Proceed to Checkout' }).click();
-    }
+    
 }

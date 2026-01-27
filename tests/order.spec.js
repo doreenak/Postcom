@@ -15,21 +15,17 @@ test.describe('Order for product', () => {
 
     })
 
-    test('Order a product as a new customer', async ({ page }) => {
+    test.only('Order a product as a new customer', async ({ page }) => {
         const CreateAccount = new CreateAccountPage(page);
         const registrationTab = await CreateAccount.createNewUser();
+        const orderPage = new OrderPage(registrationTab);
 
-        // Order the product here, not in the hook
-        // Example in CreateAccountPage.js or test file
-        // Ensure 'registrationTab' (or 'page') is passed into the constructor
-        const homePage = new HomePage(registrationTab);
-
-        await registrationTab.goto('/shop'); // Ensure the shop is loaded
-        await homePage.orderProductAsNewCustomer();
+        //await registrationTab.goto('/shop'); // Ensure the shop is loaded
+        await orderPage.orderProductAsNewCustomer();
         //await expect(page).toHaveURL(/.*confirmation/); // Assert the outcome
     });
 
-    test.only('Order a product as an existing customer', async ({ page }) => {
+    test('Order a product as an existing customer', async ({ page }) => {
         const Login = new LoginPage(page);
         await Login.gotoLoginPage();
         await Login.login('postcom2@sharklasers.com', 'Postcom2@');

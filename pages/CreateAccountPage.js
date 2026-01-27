@@ -62,7 +62,7 @@ exports.CreateAccountPage = class createAccountPage {
         const homePageOnNewTab = new HomePage(registrationTab);
         // Ensure the shop is loaded before searching
         await registrationTab.goto('/shop');
-        await homePageOnNewTab.orderProductAsNewCustomer();
+        //await homePageOnNewTab.orderProductAsNewCustomer();
         return registrationTab;
 
 

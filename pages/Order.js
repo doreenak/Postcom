@@ -16,7 +16,7 @@ exports.OrderPage = class orderPage {
         this.clear_cart_button = page.getByRole('button', { name: 'Clear Cart' });
         this.continue_shopping_button = page.getByRole('button', { name: 'Continue Shopping' });
         this.add_to_cart_btn = page.getByRole('button', { name: 'ADD TO CART' });
-        this.view_cart = page.getByRole('link', { name: 'VIEW CART' });
+        this.view_cart = page.getByRole('button', { name: 'VIEW CART' });
         this.checkoutButton = page.getByRole('button', { name: 'Proceed to Checkout' });
         this.choose_delivery_method = page.getByRole('radio', { name: 'Door Delivery' });
         this.select_address = page.locator('.flex.items-start').first();
@@ -34,6 +34,9 @@ exports.OrderPage = class orderPage {
         this.delivery_instructions = page.getByRole('textbox', { name: 'Examples: Near the blue gate' });
         this.save_address_button = page.getByRole('button', { name: 'Save Address' });
         this.enterAddressDetails = page.getByRole('textbox', { name: 'your.email@example.com' });
+        this.Out_of_stock = this.page.getByText('Out of Stock')
+        this.productList = this.page.locator('.product-list');
+
 
 
     }
@@ -49,40 +52,101 @@ exports.OrderPage = class orderPage {
     //     await this.page.getByLabel('Postal Code').fill(address.postalCode);
     //     await this.page.getByLabel('Country').fill(address.country);
     // }
+    async orderProductAsNewCustomer() {
 
-    async checkCartIsEmpty() {
-        await this.page.goto('/cart');
-        const cartItems = this.page.locator('.cart-item-row');
-        const clear_cart_button = this.page.getByRole('button', { name: 'Clear Cart' });
+        await this.page.goto('/shop')
+        await this.page.getByRole('button', { name: 'Add to cart' }).first();
+        await this.first_product.scrollIntoViewIfNeeded();
+        await this.first_product.click();
+        // const productList = this.page.locator('.product-list')
+        // await productList.scrollIntoViewIfNeeded();
 
-        // 3. Check if cart has items
-        // .count() returns the number of elements matching the locator
-        const itemCount = await cartItems.count();
+        // await expect(this.productList).toBeVisible();
 
-        if (itemCount > 0) {
-            console.log(`Found ${itemCount} items. Clearing cart...`);
-            await clear_cart_button.click();
+        // const availableProducts = productList.locator('.absolute.inset-0.flex.items-center.justify-center.gap-3').filter({
+        //     hasNotText: 'Out of stock'
+        // });
 
-            // Wait for the cart to be empty (optional but recommended)
-            await expect(cartItems).toHaveCount(0);
-        } else {
-            console.log('Cart is already empty.');
-        }
-        await this.continue_shopping_button.click();
+        // const count = await availableProducts.count();
+        // if(count === 0) throw new Error('No products available to purchase');
+
+        // const thirdProduct = count >= 3 ? availableProducts.nth(2) : availableProducts.first();
+
+        // //await expect(thirdProduct).toBeVisible({ timeout: 10000 });
+        // await thirdProduct.click();
+
+        // if (await availableProduct.count() > 0) {
+        //     await availableProduct.click();
+        // } else {
+        //     console.log('No available products found.');
+        // }
+
+        // await this.page.pause();ProductAsNewCustomer was 
+        // await this.searchProduct('Laptop');
+        // if(await this.Out_of_stock.isVisible()){
+        //     await this.searchProduct('stamps')
+        // }else{
+        //     console.log('Continue with order process')
+        // }
+        // await this.page.getByRole('img', { name: 'HP laptop' }).click();
+        await this.page.getByRole('button', { name: 'ADD TO CART' }).click();
+        await this.page.getByRole('link', { name: 'VIEW CART', exact: true }).click();
+        await this.checkoutButton.click();
+        // const checkoutButton = this.page.getByRole('button', { name: 'Proceed to Checkout' });
+        // if (await checkoutButton.isVisible()) {
+        //     await checkoutButton.click();
+        // } else {
+        //     await this.page.getByRole('button', { name: 'Continue Shopping' }).click();
+        // }
+
+        await this.page.pause();
+        await expect(this.page).toHaveURL(/.*\/checkout/, { timeout: 10000 });
+        await this.choose_delivery_method.check();
+        await expect(this.page.locator('.w-4.h-4.cursor-pointer')).toBeVisible();
+        await this.page.pause();
+
+        await this.delivery_address.fill('Bugolobi');
+        // Wait for the suggestion list and click the second result (index 1)
+        //await this.page.locator('.pac-item, .suggestion-item').nth(0).click();
+        const suggestion = this.page.getByText('BugolobiKampala, Uganda').first();
+
+        await suggestion.waitFor({ state: 'visible' });
+        await suggestion.click({ force: true });
+        await this.page.getByRole('combobox').selectOption('Office');
+        await this.street_address.fill('654799');
+        await this.delivery_instructions.fill('The first main gate');
+        await this.save_address_button.click();
+
+        //proceed to checkout and pay
+
+        //await this.choose_delivery_method.click();
+        await this.select_address.click();
+        await this.terms_and_conditions_checkbox.check();
+        await this.place_order_button.click();
+        //await this.page.pause();
+        await expect(this.page.getByRole('heading', { name: 'Payment Method' })).toBeVisible();
+
+        await this.page.getByRole('combobox').selectOption({ index: 2 }); // Select 'Mobile Money' option
+        await this.page.getByRole('textbox', { name: 'Enter phone number' }).fill('0770000000');
+        await this.page.getByRole('button', { name: 'Pay UGX' }).click();
+        await expect(this.page.getByRole('button', { name: 'Search', timeout: 10000})).toBeVisible();
+
+        await this.page.getByRole('heading', { name: ' Order Information' }).click();
+
+        return 'Order placed successfully';
+
+
     }
+
     async orderproductAsExistingCustomer() {
         await expect(this.page).toHaveURL(/.*\/shop/);
         const cartCounter = await this.checkCartIsEmpty();
         await this.first_product.scrollIntoViewIfNeeded();
         await this.first_product.click();
-        //await this.add_to_cart_btn.click();
-        // Order.js line 42
-        // This matches only "VIEW CART" and ignores "View cart"
-        //await this.page.pause();
+
         const addToCartBtn = this.page.getByRole('button', { name: 'ADD TO CART' });
         const viewCartLink = this.page.getByRole('link', { name: 'VIEW CART', exact: true });
-        // await expect(this.page.getByRole('link', { name: 'VIEW CART', exact: true })).toBeVisible();
-        // await this.page.getByRole('link', { name: 'VIEW CART', exact: true }).click();
+
         await addToCartBtn.click();
         await viewCartLink.click();
 
@@ -112,8 +176,27 @@ exports.OrderPage = class orderPage {
         await this.page.getByRole('heading', { name: ' Order Information' }).click();
 
         return 'Order placed successfully';
+    }
 
+    async checkCartIsEmpty() {
+        await this.page.goto('/cart');
+        const cartItems = this.page.locator('.cart-item-row');
+        const clear_cart_button = this.page.getByRole('button', { name: 'Clear Cart' });
 
+        // 3. Check if cart has items
+        // .count() returns the number of elements matching the locator
+        const itemCount = await cartItems.count();
+
+        if (itemCount > 0) {
+            console.log(`Found ${itemCount} items. Clearing cart...`);
+            await clear_cart_button.click();
+
+            // Wait for the cart to be empty (optional but recommended)
+            await expect(cartItems).toHaveCount(0);
+        } else {
+            console.log('Cart is already empty.');
+        }
+        await this.continue_shopping_button.click();
     }
     //await this.search_box.click();
     // await this.search_box.fill(productName);

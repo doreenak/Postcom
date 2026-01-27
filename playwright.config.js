@@ -35,7 +35,7 @@ export default defineConfig({
       slowMo: 1000, 
     },
     // /* Base URL to use in actions like `await page.goto('')`. */
-    baseURL: 'http://postcom.labs.eposta.ug/shop', //baseURL: process.env.BASE_URL,
+    baseURL: 'http://postcom.labs.eposta.ug', //baseURL: process.env.BASE_URL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',

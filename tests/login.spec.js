@@ -18,7 +18,7 @@ test.describe('Login suite', () => {
   test('login with valid credentials', async ({ page }) => {
 
     const Login = new LoginPage(page)
-    await Login.login('postcom2@sharklasers.com', 'Postcom2@')
+    await Login.login('postcom@sharklasers.com', 'Postcom2@')
 
   });
 
@@ -30,19 +30,19 @@ test.describe('Login suite', () => {
 
   test('Login with invalid password', async ({ page }) => {
     const Login = new LoginPage(page)
-    await Login.login('postcom2@sharklasers.com', 'Cameent123@')
+    await Login.login('postcom@sharklasers.com', 'Cameent123@')
     await expect(page.getByRole('alert')).toContainText('Invalid user password');
   });
 
   test('Login as vendor', async ({ page }) => {
     const Login = new LoginPage(page)
-    await Login.login('postcom2@sharklasers.com', 'Postcom2@')
+    await Login.login('postcom@sharklasers.com', 'Postcom2@')
     await page.getByText('Continue as vendor').click();
     await page.getByText('MY WALLET')
   })
   test('Logout successfully', async ({ page }) => {
     const Login = new LoginPage(page)
-    await Login.login('postcom2@sharklasers.com', 'Postcom2@')
+    await Login.login('postcom@sharklasers.com', 'Postcom2@')
     await page.getByText('Continue as Customer').click();
     await page.getByRole('button', { name: 'User menu' }).click();
     await page.getByRole('button', { name: 'Logout' }).click();
